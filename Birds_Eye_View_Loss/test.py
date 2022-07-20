@@ -4,9 +4,8 @@ from PIL import Image
 import cv2
 import imageio
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
+matplotlib.use('TkAgg')
 
 def save_weightmap(M, weightmap_zeros, beta0, beta1, beta2, beta3, images):
     resize=256
@@ -49,28 +48,28 @@ def save_weightmap(M, weightmap_zeros, beta0, beta1, beta2, beta3, images):
         im_inverse = cv2.warpPerspective(im, np.linalg.inv(M_scaledup), (2*resize, resize))
     else:
         im_inverse = im_orig
-
+    
     im_orig = np.clip(im_orig, 0, 1)
     im_inverse = np.clip(im_inverse, 0, 1)
     im = np.clip(im, 0, 1)
 
     fig = plt.figure()
-    ax1 = fig.add_subplot(121)
+    ax1 = fig.add_subplot(111)
     #ax2 = fig.add_subplot(422)
-    ax3 = fig.add_subplot(122)
+    # ax3 = fig.add_subplot(122)
     #ax4 = fig.add_subplot(424)
     #ax5 = fig.add_subplot(425)
     #ax6 = fig.add_subplot(426)
     #ax7 = fig.add_subplot(427)
-    ax1.imshow(im_orig)
+    # ax1.imshow(im_orig)
     #ax2.imshow(wm0_zeros)
-    ax3.imshow(im_inverse)
+    ax1.imshow(im_inverse)
     #ax4.imshow(wm1_zeros)
     #ax5.imshow(wm0_zeros/np.max(wm0_zeros)+wm1_zeros/np.max(wm1_zeros))
     # ax6.imshow(im_orig)
     # ax7.imshow(gt_orig)
     # fig.savefig(save_path + '/example/{}/weight_idx-{}_batch-{}'.format(train_or_val, idx, i))
-    fig.savefig('output')
+    fig.savefig('outpu12233t')
     plt.clf()
     plt.close(fig)
 
@@ -112,7 +111,7 @@ def main():
     global args
     parser = define_args()
     args = parser.parse_known_args()[0]
-    print(args.resize)
+    # print(args.resize)
     
     model = Net(args)
     checkpoint = torch.load("checkpoint_model_epoch_349.pth.tar")
@@ -124,7 +123,7 @@ def main():
     model = model.cuda()
     
 
-    image = imageio.imread("10.jpg")
+    image = imageio.imread("almon.png")
     image = cv2.resize(image,(args.resize*2,args.resize),interpolation=Image.BILINEAR)
 
     
@@ -142,19 +141,21 @@ def main():
     input_image = image
 
     image = image.cuda()
-    print(type(image))
+    # print(type(image))
 
-    print(image.shape)
+    # print(image.shape)
 
     with torch.no_grad():
         beta0, beta1, beta2, beta3, weightmap_zeros, M, output_net, outputs_line, outputs_hozizon = model(image, True)
         # beta0, beta1, beta2, beta3, weightmap_zeros, M, output_net, outputs_line, outputs_hozizon = model.forward(image, True)
-        print("outputs_line: ",outputs_line)
-        print("beta0: ",beta0)
-        print("outputs_hozizon: ", outputs_hozizon)
-        print("output_net: ", output_net)
-        print(output_net.shape)
+        # print("outputs_line: ",outputs_line)
+        # print("beta0: ",beta0)
+        # print("outputs_hozizon: ", outputs_hozizon)
+        # print("output_net: ", output_net)
+        # print(output_net.shape)
         save_weightmap(M, weightmap_zeros, beta0, beta1, beta2, beta3, input_image)
 
 if __name__ == '__main__':
     main()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
